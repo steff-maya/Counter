@@ -25,6 +25,7 @@ public abstract class BaseFragment<BINDER extends ViewDataBinding> extends Dagge
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binder = DataBindingUtil.inflate(inflater, layoutRes(), container, false);
         setRetainInstance(true);
+        setHasOptionsMenu(true);
         return binder.getRoot();
     }
 

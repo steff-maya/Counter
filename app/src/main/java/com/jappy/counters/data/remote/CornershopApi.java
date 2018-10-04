@@ -1,6 +1,6 @@
 package com.jappy.counters.data.remote;
 
-import com.jappy.counters.data.entity.CounterEntity;
+import com.jappy.counters.domain.Counter;
 
 import java.util.List;
 
@@ -14,25 +14,25 @@ public interface CornershopApi {
     //GET /api/v1/counters
     //[]
     @GET ("/api/v1/counters")
-    Single<List<CounterEntity>> getCounters();
+    Single<List<Counter>> getCounters();
 
     //POST {title: "bob"} /api/v1/counter
     //[{id: "asdf", title: "bob", count: 0}]
     @POST ("/api/v1/counter")
-    Single<List<CounterEntity>> addCounter(@Body CounterEntity counter);
+    Single<List<Counter>> addCounter(@Body Counter counter);
 
     //POST {id: "asdf"} /api/v1/counter/inc
     //[{id: "asdf", title: "bob", count: 1}]
     @POST ("/api/v1/counter/inc")
-    Single<List<CounterEntity>> increaseCounter(@Body CounterEntity counter);
+    Single<List<Counter>> increaseCounter(@Body Counter counter);
 
     //POST {id: "qwer"} /api/v1/counter/dec
     //[{id: "qwer", title: "bob", count: 1}]
     @POST ("/api/v1/counter/dec")
-    Single<List<CounterEntity>> decreaseounter(@Body CounterEntity counter);
+    Single<List<Counter>> decreaseCounter(@Body Counter counter);
 
     //DELETE {id: "qwer"} /api/v1/counter
     //[]
     @HTTP (method = "DELETE", path = "/api/v1/counter", hasBody = true)
-    Single<List<CounterEntity>> removeCounter(@Body CounterEntity counter);
+    Single<List<Counter>> removeCounter(@Body Counter counter);
 }

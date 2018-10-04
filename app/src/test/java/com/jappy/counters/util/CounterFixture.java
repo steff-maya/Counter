@@ -24,14 +24,7 @@ public class CounterFixture {
         return this;
     }
 
-    public CounterEntity build() {
-        CounterEntity counterItem = new CounterEntity();
-        counterItem.setTitle(title);
-        counterItem.setCount(count);
-        counterItem.setId(id);
 
-        return counterItem;
-    }
 
     public Counter buildItem() {
         Counter counterItem = new Counter();

@@ -12,7 +12,7 @@ public interface CounterRepository {
 
     Single<List<Counter>> addCounter(Counter counter);
 
-    Single<List<Counter>> decreaseounter(Counter counter);
+    Single<List<Counter>> decreaseCounter(Counter counter);
 
     Single<List<Counter>> increaseCounter(Counter counter);
 

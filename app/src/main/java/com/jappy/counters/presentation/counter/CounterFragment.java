@@ -7,34 +7,45 @@ import com.jappy.counters.databinding.FragmentCounterBinding;
 import com.jappy.counters.domain.Counter;
 import com.jappy.counters.presentation.EventListener;
 import com.jappy.counters.presentation.counter.adapter.CounterListAdapter;
-import com.jappy.counters.presentation.utils.RecyclerItemTouchHelper;
+import com.jappy.counters.presentation.utils.CountDrawable;
+import com.jappy.counters.presentation.utils.Response;
 
+import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView.ViewHolder;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CounterFragment extends BaseFragment<FragmentCounterBinding> implements EventListener, RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
+public class CounterFragment extends BaseFragment<FragmentCounterBinding> implements EventListener {
 
     @Inject ViewModelFactory viewModelFactory;
     @Inject CounterListAdapter adapter;
     private CounterViewModel viewModel;
+    MenuItem menuItem;
+    MenuItem menuItemBin;
 
     public CounterFragment() {
         // Required empty public constructor
@@ -47,98 +58,153 @@ public class CounterFragment extends BaseFragment<FragmentCounterBinding> implem
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        getActivity().invalidateOptionsMenu();
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(CounterViewModel.class);
         binder.recyclerView.setAdapter(adapter);
         adapter.setListener(this);
         binder.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        binder.bottomLayout.ivActionAdd.setOnClickListener(view12 -> {
-            Animation animation;
-            animation = AnimationUtils.loadAnimation(getActivity(),
-                    R.anim.left_anim);
-            binder.bottomLayout.llTotal.setVisibility(View.GONE);
-            binder.bottomLayout.llInput.setVisibility(View.VISIBLE);
-            binder.bottomLayout.llInput.startAnimation(animation);
+        viewModel.getResponse().observe(this, response -> processResponse(response));
+        viewModel.getTotal().observe(this, total -> updateTotal(total));
+        viewModel.getMessage().observe(this, showMessage -> processMessage(showMessage));
+
+        binder.totalContainer.ivActionAdd.setOnClickListener(view12 -> {
+            addAnimation();
         });
 
-        binder.bottomLayout.ivActionCheck.setOnClickListener(view1 -> {
-            hidewSoftKeyboard(view1);
-            Animation animation;
-            animation = AnimationUtils.loadAnimation(getActivity(),
-                    R.anim.left_anim);
-            binder.bottomLayout.llTotal.setVisibility(View.VISIBLE);
-            binder.bottomLayout.llInput.setVisibility(View.GONE);
-            binder.bottomLayout.llTotal.startAnimation(animation);
-            if (binder.bottomLayout.tiAddItem.getText().length() > 0) {
-                viewModel.addCounter(binder.bottomLayout.tiAddItem.getText().toString());
-                binder.bottomLayout.tiAddItem.setText("");
+        binder.totalContainer.ivActionCheck.setOnClickListener(view1 -> {
+            hideSoftKeyboard(getActivity());
+            if (validCounterName(binder.totalContainer.tiAddItem.getText().toString())) {
+                viewModel.addCounter(binder.totalContainer.tiAddItem.getText().toString());
             }
+            checkAnimation();
         });
 
-        initViewModel();
+        binder.totalContainer.tiAddItem.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                hideSoftKeyboard(getActivity());
 
-        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
-        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(binder.recyclerView);
+                if (validCounterName(binder.totalContainer.tiAddItem.getText().toString())) {
+                    viewModel.addCounter(binder.totalContainer.tiAddItem.getText().toString());
+                }
+                checkAnimation();
+                return true;
+            }
+            return false;
+        });
     }
 
-    public void hidewSoftKeyboard(View view) {
-        InputMethodManager inputManager = (InputMethodManager) getActivity()
-                .getSystemService(Context.INPUT_METHOD_SERVICE);
+    public boolean validCounterName(final String name) {
+        if ((name.length() > 0 && name.length() < 2)) {
+            showMessage(getResources().getString(R.string.valid_counter_name));
+            return false;
+        }
+        return true;
+    }
 
-        // check if no view has focus:
-        View currentFocusedView = getActivity().getCurrentFocus();
-        if (currentFocusedView != null) {
-            inputManager.hideSoftInputFromWindow(currentFocusedView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+    public void addAnimation() {
+        Animation animation;
+        animation = AnimationUtils.loadAnimation(getActivity(),
+                R.anim.left_anim);
+        binder.totalContainer.llTotal.setVisibility(View.GONE);
+        binder.totalContainer.llInput.setVisibility(View.VISIBLE);
+        binder.totalContainer.llInput.startAnimation(animation);
+    }
+
+    public void checkAnimation() {
+        Animation animation;
+        animation = AnimationUtils.loadAnimation(getActivity(),
+                R.anim.left_anim);
+        binder.totalContainer.llTotal.setVisibility(View.VISIBLE);
+        binder.totalContainer.llInput.setVisibility(View.GONE);
+        binder.totalContainer.llTotal.startAnimation(animation);
+        binder.totalContainer.tiAddItem.setText("");
+    }
+
+    private void updateTotal(final String total) {
+        setCount(total);
+        binder.totalContainer.tvTotalCount.setText(total);
+    }
+
+    public static void hideSoftKeyboard(Activity activity) {
+        View view = activity.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 
-    public void  showMessage(String msj){
-        Snackbar.make(binder.coordinatorLayout, msj, Snackbar.LENGTH_SHORT)
-                .show();
+    private void processResponse(Response response) {
+        switch (response.status) {
+            case LOADING:
+                LoadingState(true);
+                break;
+
+            case SUCCESS:
+                setData(response.data);
+
+                break;
+
+            case ERROR:
+                ErrorState(response.error);
+                break;
+        }
     }
 
-    private void initViewModel() {
-        viewModel.getCounters().observe(this, counter -> {
-            if (counter != null) {
-                binder.recyclerView.setVisibility(View.VISIBLE);
-                adapter.setList(counter, true);
-            }
-        });
-        viewModel.getTotal().observe(this, counter -> {
-            if (counter != null) {
-                binder.bottomLayout.tvTotalCount.setText(String.valueOf(counter));
-            }
-        });
+    private void ErrorState(final Throwable error) {
+        LoadingState(false);
+        binder.llContainer.setVisibility(View.GONE);
+        binder.emptyContainer.emptyLayout.setVisibility(View.VISIBLE);
+        binder.emptyContainer.tvMessage.setText(error.getMessage());
 
-        viewModel.getcounterOperationError().observe(this, isError -> {
-            if (isError != null) {
-                if (isError) {
-                   showMessage(getActivity().getResources().getString(R.string.counter_error));
-                }
-            }
-        });
+    }
 
-        viewModel.getError().observe(this, isError -> {
-            if (isError != null) {
-                if (isError) {
-                    binder.tvError.setVisibility(View.VISIBLE);
-                    binder.recyclerView.setVisibility(View.GONE);
-                    binder.tvError.setText("An Error Occurred While Loading Data!");
-                } else {
-                    binder.tvError.setVisibility(View.GONE);
-                    binder.tvError.setText(null);
-                }
-            }
-        });
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
 
-        viewModel.getLoading().observe(this, isLoading -> {
-            if (isLoading != null) {
-                binder.loadingView.setVisibility(isLoading ? View.VISIBLE : View.GONE);
-                if (isLoading) {
-                    binder.tvError.setVisibility(View.GONE);
-                    binder.recyclerView.setVisibility(View.GONE);
-                }
-            }
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menuItem = menu.findItem(R.id.ic_group);
+        menuItemBin = menu.findItem(R.id.ic_bin);
+        menuItemBin.setOnMenuItemClickListener(menuItem -> {
+            viewModel.deleteAllCounter();
+            return false;
         });
+        setCount("0");
+    }
+
+    public void setCount(String count) {
+
+        if (getActivity() != null && isAdded()) {
+
+            LayerDrawable icon = (LayerDrawable) menuItem.getIcon();
+            CountDrawable badge;
+
+            // Reuse drawable if possible
+            Drawable reuse = icon.findDrawableByLayerId(R.id.ic_group_count);
+            if (reuse != null && reuse instanceof CountDrawable) {
+                badge = (CountDrawable) reuse;
+            } else {
+                badge = new CountDrawable(getActivity());
+            }
+
+            badge.setCount(count);
+            icon.mutate();
+            icon.setDrawableByLayerId(R.id.ic_group_count, badge);
+        }
+    }
+
+    private void LoadingState(boolean isVisibility) {
+        if (isVisibility) {
+            binder.llContainer.setVisibility(View.GONE);
+            binder.emptyContainer.emptyLayout.setVisibility(View.GONE);
+            binder.loadingContainer.loadingContainer.setVisibility(View.VISIBLE);
+        } else {
+            binder.llContainer.setVisibility(View.VISIBLE);
+            binder.loadingContainer.loadingContainer.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -147,18 +213,42 @@ public class CounterFragment extends BaseFragment<FragmentCounterBinding> implem
     }
 
     @Override
-    public void decreaseounter(final Counter item) {
+    public void decreaseCounter(final Counter item) {
         viewModel.decreaseounter(item);
     }
 
     @Override
-    public void removeCounter(final Counter item) { viewModel.removeCounter(item); }
+    public void removeCounter(final Counter item) {
+        viewModel.removeCounter(item);
+    }
 
-    @Override
-    public void seletecCounter(final Counter item) { }
+    private void setData(final List<Counter> counter) {
+        adapter.setList(counter, true);
+        LoadingState(false);
+        if (counter.size() == 0) {
+            binder.emptyContainer.emptyLayout.setVisibility(View.VISIBLE);
+        }
+    }
 
-    @Override
-    public void onSwiped(final ViewHolder viewHolder, final int direction, final int position) {
-        viewModel.removeCounter(adapter.getItem(position));
+    private void processMessage(Response response) {
+        if (response != null) {
+            switch (response.message) {
+                case ADD:
+                    showMessage(getResources().getString(R.string.add_message));
+                    break;
+
+                case NOACTION:
+                    showMessage(getResources().getString(R.string.noaction_message));
+                    break;
+                case REMOVE:
+                    showMessage(getResources().getString(R.string.remove_message));
+                    break;
+            }
+        }
+    }
+
+    public void showMessage(String msj) {
+        Snackbar.make(binder.coordinatorLayout, msj, Snackbar.LENGTH_SHORT)
+                .show();
     }
 }

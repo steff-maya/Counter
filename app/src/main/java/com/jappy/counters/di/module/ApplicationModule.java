@@ -4,7 +4,6 @@ import com.jappy.counters.data.remote.ApiServiceFactory;
 import com.jappy.counters.data.remote.CornershopApi;
 import com.jappy.counters.data.repository.CounterRepository;
 import com.jappy.counters.data.repository.CounterRepositoryImp;
-import com.jappy.counters.data.repository.mapper.CountersToDomainMapper;
 import com.jappy.counters.presentation.counter.adapter.CounterListAdapter;
 
 import javax.inject.Singleton;
@@ -23,8 +22,8 @@ public class ApplicationModule {
     }
 
     @Provides
-    CounterRepository providesRepository(CornershopApi api, CountersToDomainMapper mapper) {
-        return new CounterRepositoryImp(api, mapper);
+    CounterRepository providesRepository(CornershopApi api) {
+        return new CounterRepositoryImp(api);
     }
 
     @Provides

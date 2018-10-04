@@ -2,5 +2,14 @@
     <string name="app_name">Counters Shop</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="counter_error">ups there was a connection problemt</string>
+    <string name="counter_error">ups there was a connection problem</string>
+    <string name="tv_loading">Loading Counters !</string>
+    <string name="tv_empty">You do not have any Counter Tap + to add one</string>
+    <string name="tv_counter">Counters</string>
+    <string name="add_message"> 1 counter added</string>
+    <string name="remove_message"> 1 counter removed</string>
+    <string name="hint_add_counter">Enter a name for your Counter</string>
+    <string name="valid_counter_name">invalid counter name</string>
+    <string name="noaction_message">There is no item to erase</string>
+
 </resources>

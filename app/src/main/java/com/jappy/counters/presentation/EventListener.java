@@ -4,7 +4,6 @@ import com.jappy.counters.domain.Counter;
 
 public interface EventListener {
     void increaseCounter(Counter item);
-    void decreaseounter(Counter item);
+    void decreaseCounter(Counter item);
     void removeCounter(Counter item);
-    void seletecCounter(Counter item);
 }

@@ -4,25 +4,10 @@
 
     <FrameLayout android:layout_width="match_parent"
                  android:layout_height="wrap_content"
+                 android:padding="2dp"
                  android:orientation="vertical">
 
-        <RelativeLayout
-                android:id="@+id/view_background"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/colorPrimary">
 
-            <ImageView
-                    android:id="@+id/delete_icon"
-                    android:layout_width="@dimen/ic_delete"
-                    android:layout_height="@dimen/ic_delete"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="@dimen/padd_10"
-                    app:srcCompat="@drawable/ic_trash_can"/>
-
-
-        </RelativeLayout>
 
         <RelativeLayout
                 android:id="@+id/view_foreground"
@@ -54,14 +39,28 @@
                             android:orientation="horizontal">
 
 
-                        <ImageView
+                        <RelativeLayout android:layout_width="50dp"
+                                     android:layout_height="50dp"
+                                     android:gravity="center"
+                                     android:background="@drawable/letter_shape">
 
-                                android:layout_width="56dp"
-                                android:layout_height="56dp"
-                                android:padding="10dp"
-                                android:layout_gravity="top"
-                                android:visibility="visible"
-                                app:srcCompat="@drawable/ic_cart_check"/>
+
+                            <android.support.v7.widget.AppCompatTextView
+                                    android:layout_width="50dp"
+                                    android:layout_height="50dp"
+                                    android:layout_gravity="top"
+                                    android:visibility="visible"
+                                    android:text="P"
+                                    android:gravity="center"
+                                    style="@style/tittleText"
+                                    android:textStyle="italic"
+                                    android:textColor="#ebb4b4b4"
+                                    android:id="@+id/tv_letter"
+                                    android:textSize="28dp"
+
+
+                            />
+                        </RelativeLayout>
 
                         <LinearLayout
                                 android:layout_width="match_parent"
@@ -76,7 +75,8 @@
                                     android:layout_marginLeft="16dp"
                                     android:text="counter"
                                     android:layout_gravity="center_vertical"
-                                    android:textSize="18sp"/>
+                                    android:textSize="18sp"
+                                    style="@style/tittleText"/>
 
                         </LinearLayout>
 
@@ -111,6 +111,7 @@
                                     android:layout_height="match_parent"
                                     android:gravity="center"
                                     android:text="0"
+                                    style="@style/tittleText"
                                     android:padding="5dp"
                                     android:textStyle="bold"
                                     android:textAlignment="center"

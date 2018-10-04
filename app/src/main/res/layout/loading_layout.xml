@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <FrameLayout
+            android:id="@+id/loading_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:layout_centerInParent="true">
+        <LinearLayout
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+
+            <ImageView android:layout_width="100dp"
+                       android:background="@drawable/watermelon"
+                       android:layout_gravity="center"
+                       android:padding="15dp"
+                       android:layout_height="100dp"/>
+
+
+            <ProgressBar
+                    android:layout_gravity="center"
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="12dp" />
+
+
+            <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_gravity="center"
+                    style="@style/tittleText"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:text="@string/tv_loading"/>
+        </LinearLayout>
+    </FrameLayout>
+</layout>

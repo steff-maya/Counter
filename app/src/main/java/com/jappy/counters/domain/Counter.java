@@ -1,9 +1,11 @@
 package com.jappy.counters.domain;
 
 public class Counter {
+
     public String id;
     public String title;
     public int count;
+
 
     public String getId() {
         return id;

@@ -4,4 +4,6 @@
     <dimen name="padd_10">10dp</dimen>
     <dimen name="ic_delete">30dp</dimen>
     <dimen name="thumbnail">90dp</dimen>
+    <dimen name="badge_count_textsize">10sp</dimen>
+    <dimen name="cart_items_quantity_top_offset">10dip</dimen>
 </resources>
